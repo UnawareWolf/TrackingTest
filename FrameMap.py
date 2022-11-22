@@ -13,9 +13,10 @@ class FrameMap:
             threshold: the minimum distance between two objects to map them
                 across frames.
         """
-        self._prev_object_map = {}
-        self._current_object_map = {}
+        self._prev_object_map = defaultdict(lambda: None)
+        self._current_object_map = defaultdict(lambda: None)
 
+        # default value will equal threshold
         self._prev_distance_map = defaultdict(lambda: threshold)
         self._current_distance_map = defaultdict(lambda: threshold)
 
@@ -27,6 +28,15 @@ class FrameMap:
         """
         if (distance < self._prev_distance_map[prev_obj] and
                 distance < self._current_distance_map[current_obj]):
+            
+            # remove mappings
+            # default value is None so previous mappings can be removed without error
+            prev_to_remove = self._current_object_map[current_obj]
+            current_to_remove = self._prev_object_map[prev_obj]
+            self._prev_object_map.pop(prev_to_remove, None)
+            self._current_object_map.pop(current_to_remove, None)
+
+            # add new mappings
             self._prev_object_map[prev_obj] = current_obj
             self._current_object_map[current_obj] = prev_obj
             self._prev_distance_map[prev_obj] = distance

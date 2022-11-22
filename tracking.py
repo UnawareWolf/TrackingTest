@@ -42,9 +42,11 @@ def get_projected_distance(prev_obj: CVObject, current_obj: CVObject) -> float:
     Returns:
         Distance between the centre of the two CVObjects, in pixels.
     """
-    distance_x = prev_obj.loc[0] - current_obj.loc[0]
+    distance_x = prev_obj.loc[0] + prev_obj.vel_x - current_obj.loc[0]
+    distance_y = prev_obj.loc[1] - current_obj.loc[1]
 
-    return abs(prev_obj.vel_x - distance_x)
+    # return abs(distance_x)
+    return (distance_x ** 2 + distance_y ** 2) ** 0.5
 
 
 def within_size_ratio(obj_1: CVObject, obj_2: CVObject) -> bool:
