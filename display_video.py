@@ -62,15 +62,17 @@ def is_window_open(title: str) -> bool:
     return cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) >= 1
 
 
-def read_video_detections(video_name: str) -> dict:
-    json_name = "{}_detections.json".format(video_name.split(".")[0])
-    detections = {}
-    with open(json_name) as f:
-        detections = json.load(f)
-    return detections
-
-
 def draw_bounding_boxes(image: numpy.ndarray, detection_frame: ty.List[CVObject]) -> numpy.ndarray:
+    """Draw bounding boxes on a video frame.
+
+    Args:
+        image: numpy array containing the current frame from the video.
+        detection_frame: list of CVObjects to draw on the frame.
+    
+    Returns:
+        A new image formed of the original image with the bounding boxes drawn
+        on top.
+    """
     for cv_obj in detection_frame:
         if cv_obj.detection_score >= THRESHOLD_TO_DRAW and cv_obj.draw:
             image = cv2.rectangle(image, cv_obj.get_top_left(), cv_obj.get_bottom_right(), cv_obj.colour, 4, 0)
@@ -80,7 +82,22 @@ def draw_bounding_boxes(image: numpy.ndarray, detection_frame: ty.List[CVObject]
     return image
 
 
-def parse_detections(detections_json: dict) -> ty.List[ty.List[CVObject]]:
+def parse_detections(video_name: str) -> ty.List[ty.List[CVObject]]:
+    """Create a 2D list of CVObjects (1D list of CVObjects for each frame).
+
+    Args:
+        video_name: the name of the video associated with the detections we
+            want to parse.
+    
+    Returns:
+        2D list of CVObjects corresponding to the detected bounding boxes in
+        the video.
+    """
+    json_name = "{}_detections.json".format(video_name.split(".")[0])
+    detections_json = {}
+    with open(json_name) as f:
+        detections_json = json.load(f)
+    
     frame_no = 1
     frames = []
     obj_id = 0
@@ -111,8 +128,7 @@ def main(video_path: str, title: str) -> NoReturn:
     video_capture = open_video(video_path)
     width, height = get_frame_dimensions(video_capture)
     wait_time = get_frame_display_time(video_capture)
-    detections_json = read_video_detections(video_path)
-    detections = parse_detections(detections_json)
+    detections = parse_detections(video_path)
 
     try:
         # read the first frame
@@ -124,9 +140,11 @@ def main(video_path: str, title: str) -> NoReturn:
 
         # run whilst there are frames and the window is still open
         while success and is_window_open(title):
+            # map previous CVObjects onto the current frame (if there has been one)
             if frame_no > 0:
                 track_objects(detections[frame_no - 1], detections[frame_no], width, height)
 
+            # draw the bounding boxes detected for the current frame
             image = draw_bounding_boxes(frame, detections[frame_no])
 
             # shrink it
@@ -149,5 +167,5 @@ def main(video_path: str, title: str) -> NoReturn:
 
 
 if __name__ == "__main__":
-    VIDEO_PATH = "resources/video_3.mp4"
+    VIDEO_PATH = "resources/video_2.mp4"
     main(VIDEO_PATH, "My Video")
