@@ -45,7 +45,6 @@ def get_projected_distance(prev_obj: CVObject, current_obj: CVObject) -> float:
     distance_x = prev_obj.loc[0] + prev_obj.vel_x - current_obj.loc[0]
     distance_y = prev_obj.loc[1] - current_obj.loc[1]
 
-    # return abs(distance_x)
     return (distance_x ** 2 + distance_y ** 2) ** 0.5
 
 
