@@ -3,6 +3,11 @@ import typing as ty
 
 GREEN = (0, 255, 0)
 RED = (0, 0, 255)
+BLUE = (255, 0, 0)
+BLACK = (0, 0, 0)
+YELLOW = (0, 255, 255)
+PURPLE = (255, 0, 255)
+WHITE = (255, 255, 255)
 
 
 class CVObject():
@@ -30,8 +35,19 @@ class CVObject():
         self.detected_class = detected_class
         if detected_class == 'person':
             self.colour = GREEN
-        else:
+        elif detected_class == 'car':
             self.colour = RED
+        elif detected_class == 'bicycle':
+            self.colour = BLUE
+        elif detected_class == 'truck':
+            self.colour = BLACK
+        elif detected_class == 'bus':
+            self.colour = YELLOW
+        elif detected_class == 'motorbike':
+            self.colour = PURPLE
+        else:
+            # default colour
+            self.colour = WHITE
         
         self.width = box[2]
         self.height = box[3]
